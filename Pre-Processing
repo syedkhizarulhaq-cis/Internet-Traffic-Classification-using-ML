@@ -72,9 +72,26 @@ data.drop(columns=['Flow.Duration','Total.Fwd.Packets','Total.Backward.Packets',
           'Active.Std','Idle.Mean','Idle.Std'],inplace=True)
           
 #Encoding Labels
+data['ProtocolName'].unique()
 
-stacked = data[['ProtocolName']].stack()
-data[['ProtocolName']] = pd.Series(stacked.factorize()[0], index=stacked.index).unstack()
+map_ProtocolName={'HTTP_PROXY':0, 'HTTP':1, 'HTTP_CONNECT':2, 'SSL':3, 'GOOGLE':4, 'YOUTUBE':5,
+       'FACEBOOK':6, 'CONTENT_FLASH':7, 'DROPBOX':8, 'WINDOWS_UPDATE':9, 'AMAZON':10,
+       'MICROSOFT':11, 'TOR':12, 'GMAIL':13, 'YAHOO':14, 'MSN':15, 'SSL_NO_CERT':16,
+       'SKYPE':17, 'MS_ONE_DRIVE':18, 'MSSQL':19, 'TWITTER':20, 'APPLE_ICLOUD':21,
+       'CLOUDFLARE':22, 'UBUNTUONE':23, 'OFFICE_365':24, 'WIKIPEDIA':25, 'OPENSIGNAL':26,
+       'DNS':27, 'HTTP_DOWNLOAD':28, 'WHATSAPP':29, 'APPLE_ITUNES':30, 'FTP_DATA':31,
+       'CITRIX':32, 'APPLE':33, 'MQTT':34, 'INSTAGRAM':35, 'EBAY':36, 'GOOGLE_MAPS':37,
+       'IP_ICMP':38, 'NTP':39, 'TEAMVIEWER':40, 'SPOTIFY':41, 'EASYTAXI':42,
+       'MAIL_IMAPS':43, 'TWITCH':44, 'NETFLIX':45, 'SSH':46, 'SIMET':47,
+       'UNENCRYPED_JABBER':48, 'WAZE':49, 'UPNP':50, 'EDONKEY':51, 'OSCAR':52, 'ORACLE':53,
+       'DEEZER':54, 'OPENVPN':55, 'WHOIS_DAS':56, 'SKINNY':57, 'STARCRAFT':58, 'NFS':59,
+       'RTMP':60, 'TEAMSPEAK':61, 'SNMP':62, '99TAXI':63, 'QQ':64, 'TELEGRAM':65,
+       'FTP_CONTROL':66, 'LOTUS_NOTES':67, 'H323':68, 'CITRIX_ONLINE':69, 'LASTFM':70,
+       'IP_OSPF':71, 'CNN':72, 'BGP':73, 'RADIUS':74, 'SOCKS':75, 'BITTORRENT':76, 'TIMMEU':77}
+
+data['ProtocolName']=data['ProtocolName'].map(map_ProtocolName)
+#stacked = data[['ProtocolName']].stack()
+#data[['ProtocolName']] = pd.Series(stacked.factorize()[0], index=stacked.index).unstack()
 
 y = data['ProtocolName']
 x = data.drop(columns=['ProtocolName'])
@@ -82,4 +99,28 @@ x = data.drop(columns=['ProtocolName'])
 from sklearn.model_selection import train_test_split
 x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.20)
 
+from sklearn.neighbors import KNeighborsClassifier
+# Create KNN classifier
+knn = KNeighborsClassifier(n_neighbors = 3)
+# Fit the classifier to the data
+knn.fit(x_train,y_train)
 
+#Predict the response for test dataset
+y_pred = knn.predict(x_test)
+
+#Import scikit-learn metrics module for accuracy calculation
+from sklearn import metrics
+
+# Model Accuracy, how often is the classifier correct?
+print("Accuracy:",metrics.accuracy_score(y_test, y_pred))
+
+
+#on unseen data
+results = knn.predict(dataunseen)
+
+
+#for displaying keys from the values
+for result in results:
+    for key,value in map_ProtocolName.items(): 
+        if result == value:
+            print(key)
