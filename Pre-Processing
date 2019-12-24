@@ -1,5 +1,6 @@
 import pandas as pd
-
+#for feature selection visit:
+#https://towardsdatascience.com/feature-selection-techniques-in-machine-learning-with-python-f24e7da3f36e
 data=pd.read_csv('E:/Network Data/appclass.csv')
 
 data.drop(columns=['Flow.ID', 'Source.IP', 'Destination.IP', 'Protocol','Timestamp','Fwd.Packet.Length.Max', 'Fwd.Packet.Length.Min',
